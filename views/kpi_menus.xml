@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+
+    <!-- ========================= -->
+    <!-- Menus -->
+    <!-- ========================= -->
+
+    <!-- Root Menu -->
+    <menuitem id="menu_kpi_root"
+              name="KPI Management"
+              web_icon="project_costing,static/description/icon.png"
+              sequence="10"/>
+
+    <!-- Projects Sub-Menu -->
+    <menuitem id="menu_kpi_projects"
+              name="Projects"
+              parent="menu_kpi_root"
+              action="action_kpi_project"
+              sequence="10"
+              groups="base.group_user"/>
+
+    <!-- Labor Sub-Menu -->
+    <menuitem id="menu_kpi_labor"
+              name="Labor Lines"
+              parent="menu_kpi_root"
+              action="action_kpi_labor"
+              sequence="20"
+              groups="base.group_user"/>
+
+    <!-- Equipment Sub-Menu -->
+    <menuitem id="menu_kpi_equipment"
+              name="Equipment Lines"
+              parent="menu_kpi_root"
+              action="action_kpi_equipment"
+              sequence="30"
+              groups="base.group_user"/>
+</odoo>

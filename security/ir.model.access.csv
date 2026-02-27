@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_kpi_project_user,kpi.project.user,model_kpi_project,project_costing.group_kpi_user,1,1,1,0
+access_kpi_project_manager,kpi.project.manager,model_kpi_project,project_costing.group_kpi_manager,1,1,1,1
+access_kpi_labor_user,kpi.labor.user,model_kpi_labor,project_costing.group_kpi_user,1,1,1,0
+access_kpi_labor_manager,kpi.labor.manager,model_kpi_labor,project_costing.group_kpi_manager,1,1,1,1
+access_kpi_equipment_user,kpi.equipment.user,model_kpi_equipment,project_costing.group_kpi_user,1,1,1,0
+access_kpi_equipment_manager,kpi.equipment.manager,model_kpi_equipment,project_costing.group_kpi_manager,1,1,1,1
+access_kpi_purchase_wizard,kpi.purchase.wizard,model_kpi_purchase_wizard,base.group_user,1,1,1,1
+access_kpi_purchase_wizard_line,kpi.purchase.wizard.line,model_kpi_purchase_wizard_line,base.group_user,1,1,1,1

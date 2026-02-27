@@ -1,0 +1,10 @@
+<odoo>
+    <record id="seq_kpi_project" model="ir.sequence">
+        <field name="name">KPI Project Sequence</field>
+        <field name="code">kpi.project</field>
+        <field name="prefix">KPI/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+        <field name="active">True</field>
+    </record>
+</odoo>

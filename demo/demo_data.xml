@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- ===================================================== -->
+    <!--  Demo Partners (Clients)                               -->
+    <!-- ===================================================== -->
+    <record id="demo_client_nile" model="res.partner">
+        <field name="name">Nile Construction Co.</field>
+        <field name="is_company">True</field>
+        <field name="email">info@nileconstruction.com</field>
+        <field name="phone">+20 2 1234 5678</field>
+    </record>
+
+    <record id="demo_client_delta" model="res.partner">
+        <field name="name">Delta Tech Solutions</field>
+        <field name="is_company">True</field>
+        <field name="email">contact@deltatech.eg</field>
+        <field name="phone">+20 2 9876 5432</field>
+    </record>
+
+    <record id="demo_client_cairo" model="res.partner">
+        <field name="name">Cairo Infra Group</field>
+        <field name="is_company">True</field>
+        <field name="email">projects@cairoinfra.com</field>
+    </record>
+
+    <!-- ===================================================== -->
+    <!--  Demo Employees                                        -->
+    <!-- ===================================================== -->
+    <record id="demo_employee_ahmed" model="hr.employee">
+        <field name="name">Ahmed Hassan</field>
+        <field name="job_title">Civil Engineer</field>
+        <field name="work_email">ahmed.hassan@demo.com</field>
+    </record>
+
+    <record id="demo_employee_sara" model="hr.employee">
+        <field name="name">Sara Mohamed</field>
+        <field name="job_title">Project Manager</field>
+        <field name="work_email">sara.mohamed@demo.com</field>
+    </record>
+
+    <record id="demo_employee_omar" model="hr.employee">
+        <field name="name">Omar Khaled</field>
+        <field name="job_title">Electrical Engineer</field>
+        <field name="work_email">omar.khaled@demo.com</field>
+    </record>
+
+    <record id="demo_employee_layla" model="hr.employee">
+        <field name="name">Layla Nasser</field>
+        <field name="job_title">Procurement Specialist</field>
+        <field name="work_email">layla.nasser@demo.com</field>
+    </record>
+
+    <!-- ===================================================== -->
+    <!--  Demo Contracts (لحساب سعر الساعة تلقائياً)           -->
+    <!-- ===================================================== -->
+    <!-- FIX: removed state='open' - requires hr_payroll module to be safe -->
+    <!-- الـ compute في kpi.labor بتدور على state in ['open','done'] -->
+    <!-- لو مش موجود hr_payroll هيرجع hour_cost = 50 (default) وده مقبول -->
+    <record id="demo_contract_ahmed" model="hr.contract">
+        <field name="name">Ahmed Hassan - Contract</field>
+        <field name="employee_id" ref="demo_employee_ahmed"/>
+        <field name="wage">12000</field>
+        <field name="date_start">2024-01-01</field>
+    </record>
+
+    <record id="demo_contract_sara" model="hr.contract">
+        <field name="name">Sara Mohamed - Contract</field>
+        <field name="employee_id" ref="demo_employee_sara"/>
+        <field name="wage">18000</field>
+        <field name="date_start">2024-01-01</field>
+    </record>
+
+    <record id="demo_contract_omar" model="hr.contract">
+        <field name="name">Omar Khaled - Contract</field>
+        <field name="employee_id" ref="demo_employee_omar"/>
+        <field name="wage">10000</field>
+        <field name="date_start">2024-01-01</field>
+    </record>
+
+    <record id="demo_contract_layla" model="hr.contract">
+        <field name="name">Layla Nasser - Contract</field>
+        <field name="employee_id" ref="demo_employee_layla"/>
+        <field name="wage">9000</field>
+        <field name="date_start">2024-01-01</field>
+    </record>
+
+    <!-- ===================================================== -->
+    <!--  Demo Equipment                                        -->
+    <!-- ===================================================== -->
+    <!-- FIX: model_year is not a valid field in maintenance.equipment Odoo 17 - removed -->
+    <record id="demo_equipment_crane" model="maintenance.equipment">
+        <field name="name">Tower Crane - TC50</field>
+        <field name="note">Model Year: 2022</field>
+    </record>
+
+    <record id="demo_equipment_excavator" model="maintenance.equipment">
+        <field name="name">Excavator - CAT 320</field>
+        <field name="note">Model Year: 2021</field>
+    </record>
+
+    <record id="demo_equipment_generator" model="maintenance.equipment">
+        <field name="name">Generator - 500 KVA</field>
+        <field name="note">Model Year: 2023</field>
+    </record>
+
+    <!-- ===================================================== -->
+    <!--  PROJECT 1: Draft                                      -->
+    <!-- ===================================================== -->
+    <!-- FIX: code set to 'New' so sequence assigns automatically - avoids future collision -->
+    <record id="demo_project_draft" model="kpi.project">
+        <field name="name">Office Tower - New Cairo</field>
+        <field name="client_id" ref="demo_client_nile"/>
+        <field name="budget">500000</field>
+        <field name="selling_price">620000</field>
+        <field name="start_date">2025-03-01</field>
+        <field name="end_date">2025-08-31</field>
+        <field name="state">draft</field>
+    </record>
+
+    <record id="demo_labor_draft_1" model="kpi.labor">
+        <field name="project_id" ref="demo_project_draft"/>
+        <field name="employee_id" ref="demo_employee_ahmed"/>
+        <field name="hours">120</field>
+        <field name="hour_cost">75</field>
+    </record>
+
+    <record id="demo_labor_draft_2" model="kpi.labor">
+        <field name="project_id" ref="demo_project_draft"/>
+        <field name="employee_id" ref="demo_employee_layla"/>
+        <field name="hours">80</field>
+        <field name="hour_cost">56</field>
+    </record>
+
+    <record id="demo_equipment_draft_1" model="kpi.equipment">
+        <field name="project_id" ref="demo_project_draft"/>
+        <field name="equipment_id" ref="demo_equipment_crane"/>
+        <field name="quantity">1</field>
+        <field name="days">30</field>
+        <field name="day_cost">1200</field>
+    </record>
+
+    <!-- ===================================================== -->
+    <!--  PROJECT 2: Submitted                                  -->
+    <!-- ===================================================== -->
+    <record id="demo_project_submitted" model="kpi.project">
+        <field name="name">Warehouse Complex - 6th October</field>
+        <field name="client_id" ref="demo_client_delta"/>
+        <field name="budget">320000</field>
+        <field name="selling_price">390000</field>
+        <field name="start_date">2025-02-01</field>
+        <field name="end_date">2025-06-30</field>
+        <field name="state">submitted</field>
+    </record>
+
+    <record id="demo_labor_sub_1" model="kpi.labor">
+        <field name="project_id" ref="demo_project_submitted"/>
+        <field name="employee_id" ref="demo_employee_sara"/>
+        <field name="hours">200</field>
+        <field name="hour_cost">113</field>
+    </record>
+
+    <record id="demo_labor_sub_2" model="kpi.labor">
+        <field name="project_id" ref="demo_project_submitted"/>
+        <field name="employee_id" ref="demo_employee_omar"/>
+        <field name="hours">150</field>
+        <field name="hour_cost">63</field>
+    </record>
+
+    <record id="demo_equipment_sub_1" model="kpi.equipment">
+        <field name="project_id" ref="demo_project_submitted"/>
+        <field name="equipment_id" ref="demo_equipment_excavator"/>
+        <field name="quantity">2</field>
+        <field name="days">45</field>
+        <field name="day_cost">800</field>
+    </record>
+
+    <record id="demo_equipment_sub_2" model="kpi.equipment">
+        <field name="project_id" ref="demo_project_submitted"/>
+        <field name="equipment_id" ref="demo_equipment_generator"/>
+        <field name="quantity">1</field>
+        <field name="days">120</field>
+        <field name="day_cost">350</field>
+    </record>
+
+    <!-- ===================================================== -->
+    <!--  PROJECT 3: Approved                                   -->
+    <!-- ===================================================== -->
+    <record id="demo_project_approved" model="kpi.project">
+        <field name="name">Road Infrastructure - Ring Road</field>
+        <field name="client_id" ref="demo_client_cairo"/>
+        <field name="budget">750000</field>
+        <field name="selling_price">950000</field>
+        <field name="start_date">2024-11-01</field>
+        <field name="end_date">2025-05-31</field>
+        <field name="state">approved</field>
+    </record>
+
+    <record id="demo_labor_app_1" model="kpi.labor">
+        <field name="project_id" ref="demo_project_approved"/>
+        <field name="employee_id" ref="demo_employee_ahmed"/>
+        <field name="hours">400</field>
+        <field name="hour_cost">75</field>
+    </record>
+
+    <record id="demo_labor_app_2" model="kpi.labor">
+        <field name="project_id" ref="demo_project_approved"/>
+        <field name="employee_id" ref="demo_employee_sara"/>
+        <field name="hours">250</field>
+        <field name="hour_cost">113</field>
+    </record>
+
+    <record id="demo_labor_app_3" model="kpi.labor">
+        <field name="project_id" ref="demo_project_approved"/>
+        <field name="employee_id" ref="demo_employee_omar"/>
+        <field name="hours">300</field>
+        <field name="hour_cost">63</field>
+    </record>
+
+    <record id="demo_equipment_app_1" model="kpi.equipment">
+        <field name="project_id" ref="demo_project_approved"/>
+        <field name="equipment_id" ref="demo_equipment_crane"/>
+        <field name="quantity">1</field>
+        <field name="days">90</field>
+        <field name="day_cost">1200</field>
+    </record>
+
+    <record id="demo_equipment_app_2" model="kpi.equipment">
+        <field name="project_id" ref="demo_project_approved"/>
+        <field name="equipment_id" ref="demo_equipment_excavator"/>
+        <field name="quantity">3</field>
+        <field name="days">60</field>
+        <field name="day_cost">800</field>
+    </record>
+
+    <!-- ===================================================== -->
+    <!--  PROJECT 4: Done                                       -->
+    <!-- ===================================================== -->
+    <record id="demo_project_done" model="kpi.project">
+        <field name="name">Residential Complex - Maadi</field>
+        <field name="client_id" ref="demo_client_nile"/>
+        <field name="budget">280000</field>
+        <field name="selling_price">360000</field>
+        <field name="start_date">2024-06-01</field>
+        <field name="end_date">2024-12-31</field>
+        <field name="state">done</field>
+    </record>
+
+    <record id="demo_labor_done_1" model="kpi.labor">
+        <field name="project_id" ref="demo_project_done"/>
+        <field name="employee_id" ref="demo_employee_sara"/>
+        <field name="hours">320</field>
+        <field name="hour_cost">113</field>
+    </record>
+
+    <record id="demo_labor_done_2" model="kpi.labor">
+        <field name="project_id" ref="demo_project_done"/>
+        <field name="employee_id" ref="demo_employee_layla"/>
+        <field name="hours">180</field>
+        <field name="hour_cost">56</field>
+    </record>
+
+    <record id="demo_equipment_done_1" model="kpi.equipment">
+        <field name="project_id" ref="demo_project_done"/>
+        <field name="equipment_id" ref="demo_equipment_generator"/>
+        <field name="quantity">1</field>
+        <field name="days">180</field>
+        <field name="day_cost">350</field>
+    </record>
+
+</odoo>

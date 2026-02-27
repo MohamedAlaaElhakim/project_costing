@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- ========================= -->
+    <!-- QWeb Template -->
+    <!-- ========================= -->
+    <template id="report_kpi_project_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <!-- Header -->
+                        <div class="row mt-4">
+                            <div class="col-6">
+                                <h2>Project KPI Report</h2>
+                            </div>
+                            <div class="col-6 text-right">
+                                <strong>Reference:</strong> <span t-field="doc.code"/><br/>
+                                <strong>Date:</strong> <span t-field="doc.create_date" t-options='{"widget": "date"}'/>
+                            </div>
+                        </div>
+
+                        <!-- Project Info -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h4>Project Information</h4>
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td><strong>Project Name:</strong></td>
+                                        <td><span t-field="doc.name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Client:</strong></td>
+                                        <td><span t-field="doc.client_id"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Status:</strong></td>
+                                        <td><span t-field="doc.state"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Period:</strong></td>
+                                        <td>
+                                            <span t-field="doc.start_date"/> to <span t-field="doc.end_date"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Financials -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h4>Financial Summary</h4>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Budget</th>
+                                            <th>Selling Price</th>
+                                            <th>Total Cost</th>
+                                            <th>Profit</th>
+                                            <th>Margin</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span t-field="doc.budget" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                            <td><span t-field="doc.selling_price" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                            <td><span t-field="doc.total_cost" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                            <td><span t-field="doc.profit" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                            <td><span t-esc="doc.profit_margin"/> %</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Labor Lines -->
+                        <div class="row mt-4" t-if="doc.labor_ids">
+                            <div class="col-12">
+                                <h4>Labor Details</h4>
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Employee</th>
+                                            <th>Hours</th>
+                                            <th>Cost/Hour</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="doc.labor_ids" t-as="line">
+                                            <td><span t-field="line.employee_id"/></td>
+                                            <td><span t-field="line.hours"/></td>
+                                            <td><span t-field="line.hour_cost" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                            <td><span t-field="line.subtotal" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Equipment Lines -->
+                        <div class="row mt-4" t-if="doc.equipment_ids">
+                            <div class="col-12">
+                                <h4>Equipment Details</h4>
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Equipment</th>
+                                            <th>Days</th>
+                                            <th>Cost/Day</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="doc.equipment_ids" t-as="line">
+                                            <td><span t-field="line.equipment_id"/></td>
+                                            <td><span t-field="line.days"/></td>
+                                            <td><span t-field="line.day_cost" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                            <td><span t-field="line.subtotal" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- ========================= -->
+    <!-- Report Action -->
+    <!-- ========================= -->
+    <record id="action_report_kpi_project" model="ir.actions.report">
+        <field name="name">KPI Project Report</field>
+        <field name="model">kpi.project</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">project_costing.report_kpi_project_document</field>
+        <field name="report_file">project_costing.report_kpi_project_document</field>
+        <field name="print_report_name">'KPI - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_kpi_project"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

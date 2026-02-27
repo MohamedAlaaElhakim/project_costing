@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_project_form_inherit_kpi" model="ir.ui.view">
+        <field name="name">project.project.form.inherit.kpi</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button"
+                        icon="fa-line-chart"
+                        name="%(project_costing.action_kpi_project)d"
+                        type="action"
+                        context="{'search_default_project_id': active_id}">
+                    <field name="name" widget="statinfo" string="KPIs"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>
