@@ -14,7 +14,6 @@ class KpiProject(models.Model):
     # =================
     SEQUENCE_CODE = "kpi.project"
     LOCKED_STATES = ("done", "cancelled")
-    # ✅ FIX: كان "your_kpi_module.group_kpi_manager" وده اسم module غلط
     MANAGER_GROUP_XMLID = "project_costing.group_kpi_manager"
 
     # =================
@@ -118,7 +117,6 @@ class KpiProject(models.Model):
         store=True,
     )
 
-    # Counts (للعرض في الـ Statinfo)
     labor_lines_count = fields.Integer(compute="_compute_counts", store=False)
     equipment_lines_count = fields.Integer(compute="_compute_counts", store=False)
 
@@ -148,7 +146,6 @@ class KpiProject(models.Model):
     @api.depends("labor_ids", "equipment_ids")
     def _compute_counts(self):
         for rec in self:
-            # len آمن هنا لأن الـ One2many معمول له cache
             rec.labor_lines_count = len(rec.labor_ids)
             rec.equipment_lines_count = len(rec.equipment_ids)
 
@@ -168,7 +165,6 @@ class KpiProject(models.Model):
             if rec.state != "submitted":
                 raise UserError(_("Only submitted projects can be approved."))
 
-            # إنشاء مهمة تلقائية في مشروع الأودو الأصلي لو مربوط بمشروع
             if rec.project_id:
                 self.env['project.task'].create({
                     'name': f"Task for {rec.name}",
@@ -177,7 +173,6 @@ class KpiProject(models.Model):
                     'user_ids': [(4, self.env.uid)],
                 })
 
-            # ✅ FIX: تغيير الحالة مرة واحدة بس — كانت بتتغير مرتين قبل كده
             rec.state = "approved"
 
     def action_done(self):
@@ -207,18 +202,29 @@ class KpiProject(models.Model):
         self.write({"state": "draft"})
         self.message_post(body=_("Project has been reset to Draft by %s.") % self.env.user.name)
 
-
     def action_open_purchase_wizard(self):
         """فتح Wizard إنشاء أوامر الشراء"""
         self.ensure_one()
 
         line_vals = []
         for equipment in self.equipment_ids:
-            # ✅ FIX: كان بيستخدم hasattr وده غلط في Odoo
-            # الصح إنك تاخد الـ field مباشرة — لو مش موجود بيرجع False مش exception
-            vendor = equipment.equipment_id.vendor_id if equipment.equipment_id else False
+            # ✅ نجيب المورد بأمان
+            vendor = False
+            if equipment.equipment_id:
+                if hasattr(equipment.equipment_id, 'vendor_id') and equipment.equipment_id.vendor_id:
+                    vendor = equipment.equipment_id.vendor_id
+                elif hasattr(equipment.equipment_id, 'product_id') and equipment.equipment_id.product_id:
+                    if equipment.equipment_id.product_id.seller_ids:
+                        vendor = equipment.equipment_id.product_id.seller_ids[0].partner_id
+
+            # ✅ نجيب المنتج بأمان
+            product = False
+            if equipment.equipment_id and hasattr(equipment.equipment_id, 'product_id'):
+                product = equipment.equipment_id.product_id
+
+            # ✅ نمرر الحقول للـ Wizard (اللي إحنا أضفناها للتو)
             line_vals.append((0, 0, {
-                'equipment_id': equipment.equipment_id.id,
+                'equipment_id': equipment.equipment_id.id if equipment.equipment_id else False,
                 'vendor_id': vendor.id if vendor else False,
                 'estimated_cost': equipment.subtotal,
             }))
@@ -250,7 +256,6 @@ class KpiProject(models.Model):
     # =========================
     @api.model_create_multi
     def create(self, vals_list):
-        # لا حاجة لإنشاء الـ Sequence هنا، يجب أن يكون موجود في XML
         for vals in vals_list:
             if vals.get("code", "New") == "New":
                 vals["code"] = self.env["ir.sequence"].next_by_code(self.SEQUENCE_CODE) or "New"
@@ -340,9 +345,7 @@ class KpiProject(models.Model):
 
     @api.constrains("selling_price", "total_cost")
     def _check_price_not_less_than_cost(self):
-        # ✅ FIX: كان بيمنع حفظ المشروع لو السعر أقل من التكلفة
-        # ده بيمنع المستخدم من إنشاء مشروع وإضافة التكلفة تدريجياً
-        # تم تحويله لـ warning فقط بدل منع الحفظ
+
         pass
 
     @api.onchange("selling_price", "total_cost")

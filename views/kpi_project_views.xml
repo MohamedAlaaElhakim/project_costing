@@ -30,7 +30,7 @@
     </record>
 
     <!-- ========================= -->
-    <!-- Kanban View - إضافة جديدة -->
+    <!-- Kanban View  -->
     <!-- ========================= -->
     <record id="view_kpi_project_kanban" model="ir.ui.view">
         <field name="name">kpi.project.kanban</field>

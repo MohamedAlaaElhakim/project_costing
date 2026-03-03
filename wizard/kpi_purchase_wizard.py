@@ -12,6 +12,8 @@ class KpiPurchaseWizard(models.TransientModel):
     # سطور المعدات اللي هتختار منها (One2many لـ transient model)
     line_ids = fields.One2many("kpi.purchase.wizard.line", "wizard_id", string="Equipment Lines")
 
+
+
     def action_create_purchase_orders(self):
         """إنشاء أوامر الشراء للمعدات المختارة"""
         self.ensure_one()
@@ -58,10 +60,7 @@ class KpiPurchaseWizard(models.TransientModel):
             'target': 'current',
         }
 
-    # ✅ أضف الدالة دي (دي كانت ناقصة!)
+
     def action_cancel(self):
         """إغلاق الـ Wizard من غير تنفيذ"""
         return {'type': 'ir.actions.act_window_close'}
-
-# ✅ FIX: تم حذف KpiPurchaseWizardLine من هنا لأنها كانت معرّفة مرتين
-# الـ class الصحيحة موجودة في kpi_purchase_wizard_line.py

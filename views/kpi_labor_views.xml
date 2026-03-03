@@ -27,7 +27,7 @@
     </record>
 
     <!-- ========================= -->
-    <!-- KPI Labor Kanban View (جديد) -->
+    <!-- KPI Labor Kanban View  -->
     <!-- ========================= -->
     <record id="view_kpi_labor_kanban" model="ir.ui.view">
         <field name="name">kpi.labor.kanban</field>

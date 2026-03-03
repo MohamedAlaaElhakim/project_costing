@@ -13,7 +13,6 @@ class KpiEquipment(models.Model):
         ondelete="cascade",
     )
 
-    # لو عندك maintenance app
     equipment_id = fields.Many2one("maintenance.equipment", string="Equipment")
 
     # Currency related from project
@@ -48,8 +47,7 @@ class KpiEquipment(models.Model):
         store=True,
     )
 
-    # ✅ FIX: تم حذف cost_per_day لأنه كان بيساوي day_cost دايمًا
-    # (subtotal / days = days * day_cost / days = day_cost)
+
 
     planned_days = fields.Integer(
         string="Planned Days",
@@ -80,7 +78,6 @@ class KpiEquipment(models.Model):
     @api.depends("days", "day_cost", "quantity")
     def _compute_subtotal(self):
         for rec in self:
-            # ✅ FIX: كان بيحسب days * day_cost بس من غير quantity
             rec.subtotal = rec.days * rec.day_cost * rec.quantity
 
     @api.depends("days")
@@ -93,7 +90,6 @@ class KpiEquipment(models.Model):
         for rec in self:
             rec.hour_cost = rec.day_cost / 8.0 if rec.day_cost else 0.0
 
-    # ✅ FIX: تم حذف _compute_cost_per_day لأنها كانت بترجع نفس قيمة day_cost
 
     @api.depends("project_id.start_date", "project_id.end_date")
     def _compute_planned_days(self):
@@ -127,8 +123,5 @@ class KpiEquipment(models.Model):
                 raise ValidationError(_("Days cannot be negative."))
             if rec.day_cost < 0:
                 raise ValidationError(_("Day Cost cannot be negative."))
-            # ✅ FIX: إضافة التحقق من quantity
             if rec.quantity <= 0:
                 raise ValidationError(_("Quantity must be greater than zero."))
-
-

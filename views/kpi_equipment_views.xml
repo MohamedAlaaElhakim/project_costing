@@ -23,7 +23,7 @@
     </record>
 
     <!-- ========================= -->
-    <!-- KPI Equipment Kanban View (جديد) -->
+    <!-- KPI Equipment Kanban View  -->
     <!-- ========================= -->
     <record id="view_kpi_equipment_kanban" model="ir.ui.view">
         <field name="name">kpi.equipment.kanban</field>

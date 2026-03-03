@@ -57,7 +57,6 @@ class KpiLabor(models.Model):
     # =================
     # Computed Fields
     # =================
-    # تم إزالة حقل rate لأنه لم يكن له دالة محددة، أو يمكن إضافته لاحقاً
     days = fields.Float(string="Days", compute="_compute_days", store=True)
 
     overtime_hours = fields.Float(string="Overtime Hours", compute="_compute_overtime", store=True)
@@ -127,7 +126,6 @@ class KpiLabor(models.Model):
     @api.depends("subtotal", "project_id.total_cost")
     def _compute_cost_share(self):
         for rec in self:
-            # تحذير: الاعتماد على total_cost قد يسبب إعادة حساب متكررة
             total = rec.project_id.total_cost
             rec.cost_share_percent = (rec.subtotal / total * 100) if total else 0.0
 
@@ -136,7 +134,6 @@ class KpiLabor(models.Model):
         """جلب تكلفة الساعة من عقد الموظف أوتوماتيك"""
         for rec in self:
             if rec.employee_id and rec.employee_id.contract_ids:
-                # ✅ نأخذ أول عقد "open" أو "done" (الحالي أو الأخير)
                 active_contract = rec.employee_id.contract_ids.filtered(
                     lambda c: c.state in ['open', 'done']
                 )[:1]
@@ -165,13 +162,10 @@ class KpiLabor(models.Model):
     # Security & Locking (حرج جداً)
     # =================
     def _is_record_locked(self):
-        """✅ FIX: كانت بترجع True لو أي record في الـ recordset مقفول
-        الصح إننا نفحص كل record على حدة جوه write/unlink"""
         self.ensure_one()
         return self.project_id and self.project_id.state in ('done', 'cancelled')
 
     def write(self, vals):
-        # ✅ FIX: بنفحص كل record على حدة بدل ما نفحص الـ recordset كلها
         if not self.env.su:
             for rec in self:
                 if rec._is_record_locked():
@@ -179,7 +173,6 @@ class KpiLabor(models.Model):
         return super().write(vals)
 
     def unlink(self):
-        # ✅ FIX: بنفحص كل record على حدة بدل ما نفحص الـ recordset كلها
         if not self.env.su:
             for rec in self:
                 if rec._is_record_locked():
