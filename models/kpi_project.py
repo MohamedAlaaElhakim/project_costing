@@ -350,7 +350,6 @@ class KpiProject(models.Model):
 
     @api.onchange("selling_price", "total_cost")
     def _onchange_price_vs_cost_warning(self):
-        # ✅ FIX: warning بدل constraint — مش بيمنع الحفظ
         if self.selling_price and self.total_cost and self.selling_price < self.total_cost:
             return {
                 "warning": {

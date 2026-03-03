@@ -13,44 +13,44 @@ class KpiPurchaseWizard(models.TransientModel):
     line_ids = fields.One2many("kpi.purchase.wizard.line", "wizard_id", string="Equipment Lines")
 
 
-
     def action_create_purchase_orders(self):
-        """إنشاء أوامر الشراء للمعدات المختارة"""
+        """نسخة معالجة لخطأ AttributeError في المعدات"""
         self.ensure_one()
 
-        # 1. تصفية المعدات اللي المستخدم اختارها
         selected_lines = self.line_ids.filtered(lambda x: x.select)
-
         if not selected_lines:
             raise UserError(_("Please select at least one equipment to purchase."))
 
         purchase_orders = []
 
         for line in selected_lines:
-            # إنشاء Purchase Order
-            po = self.env['purchase.order'].create({
+            product = False
+            if line.equipment_id:
+                product = getattr(line.equipment_id, 'product_id', False)
+
+            if not product:
+                raise UserError(_(
+                    "المعدة '%s' غير مرتبطة بمنتج (Product).\n"
+                    "تأكد من إضافة حقل product_id لموديل maintenance.equipment أولاً."
+                ) % line.equipment_id.name)
+
+            po_vals = {
                 'partner_id': line.vendor_id.id,
-                'origin': f"KPI Project: {self.project_id.code}",
-                'project_id': self.project_id.project_id.id if self.project_id.project_id else False,
+                'origin': f"Project: {self.project_id.name}",
                 'order_line': [(0, 0, {
-                    'product_id': line.equipment_id.product_id.id if line.equipment_id.product_id else False,
-                    'name': line.equipment_id.name,
-                    'product_qty': 1,
-                    'product_uom': line.equipment_id.product_id.uom_po_id.id if line.equipment_id.product_id else False,
-                    'price_unit': line.estimated_cost,
+                    'product_id': product.id,
+                    'name': product.display_name or line.equipment_id.name,
+                    'product_qty': 1.0,
+                    'product_uom': product.uom_po_id.id or product.uom_id.id,
+                    'price_unit': line.estimated_cost or 0.0,
                     'date_planned': fields.Datetime.now(),
                 })],
-            })
+            }
 
+            po = self.env['purchase.order'].create(po_vals)
+            po.order_line._compute_tax_id()
             purchase_orders.append(po.id)
 
-            # تسجيل في Chatter بتاع المشروع
-            self.project_id.message_post(
-                body=_("Purchase Order %s created for equipment: %s") % (po.name, line.equipment_id.name),
-                message_type="notification"
-            )
-
-        # 3. إظهار رسالة نجاح وفتح الـ Purchase Orders
         return {
             'type': 'ir.actions.act_window',
             'name': _('Purchase Orders'),
